@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // provider = "postgresql"
+  // url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:../src/database/database.sqlite?connection_limit=1&pool_timeout=10"
+}
+
+// =========== Custom untuk Form Users
+
+// enum Gender {
+//   Pria
+//   Wanita
+// }
+// enum Role {
+//   USER
+//   ADMIN
+// }
+
+// model Users {
+//   id String @id @default(uuid()) 
+//   fullname String
+//   email String
+//   password String
+//   address String
+//   phone_number String
+//   gender Gender @default(Pria)
+//   role Role @default(USER)
+// }
+
+// =========== default untuk Form Users
+
+model Users {
+  id       String  @id @default(uuid())
+  fullname String?
+  email    String?
+  password String?
+  role     String?
+  profile  String?
+  cart     Cart?
+}
+
+model Products {
+  id           String    @id @default(uuid())
+  name_product String
+  description  String
+  price        Float
+  stock        Int
+  image        String
+  cartItem     CartItem?
+}
+
+model Cart {
+  id          String     @id @default(uuid())
+  total_price Float?
+  quantity    Int?
+  diskon      Float?
+  status      String?
+  cartItem    CartItem[]
+  user        Users      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      String     @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId String   @unique
+  status    String?
+  cart      Cart?    @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cartId    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
